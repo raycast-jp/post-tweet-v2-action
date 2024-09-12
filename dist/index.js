@@ -32215,10 +32215,10 @@ const x_1 = __nccwpck_require__(4075);
 async function run() {
     try {
         const x = (0, x_1.X)({
-            appKey: core.getInput('appKey'),
-            appSecret: core.getInput('appSecret'),
-            accessToken: core.getInput('accessToken'),
-            accessSecret: core.getInput('accessSecret')
+            appKey: core.getInput('consumer-key'),
+            appSecret: core.getInput('consumer-secret'),
+            accessToken: core.getInput('access-token'),
+            accessSecret: core.getInput('access-token-secret')
         });
         const result = await x(core.getInput('message'));
         core.setOutput('tweetID', result.data.id);
