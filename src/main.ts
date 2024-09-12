@@ -12,9 +12,9 @@ export async function run(): Promise<void> {
       appSecret: core.getInput('appSecret'),
       accessToken: core.getInput('accessToken'),
       accessSecret: core.getInput('accessSecret')
-    });
-    const result = await x(core.getInput('message'));
-    core.setOutput('tweetID', result.data.id);
+    })
+    const result = await x(core.getInput('message'))
+    core.setOutput('tweetID', result.data.id)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
