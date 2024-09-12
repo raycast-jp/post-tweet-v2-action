@@ -8,10 +8,10 @@ import { X } from './x'
 export async function run(): Promise<void> {
   try {
     const x = X({
-      appKey: core.getInput('appKey'),
-      appSecret: core.getInput('appSecret'),
-      accessToken: core.getInput('accessToken'),
-      accessSecret: core.getInput('accessSecret')
+      appKey: core.getInput('consumer-key'),
+      appSecret: core.getInput('consumer-secret'),
+      accessToken: core.getInput('access-token'),
+      accessSecret: core.getInput('access-token-secret')
     })
     const result = await x(core.getInput('message'))
     core.setOutput('tweetID', result.data.id)
