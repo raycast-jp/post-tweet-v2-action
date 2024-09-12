@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
 import { X } from './x'
 
 /**
@@ -15,7 +14,7 @@ export async function run(): Promise<void> {
       accessSecret: core.getInput('accessSecret')
     });
     const result = await x(core.getInput('message'));
-    core.setOutput('tweet', result.data.id);
+    core.setOutput('tweetID', result.data.id);
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)

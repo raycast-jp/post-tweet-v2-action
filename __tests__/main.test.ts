@@ -8,6 +8,7 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
+import * as XAPI from '../src/x'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -21,6 +22,7 @@ let errorMock: jest.SpiedFunction<typeof core.error>
 let getInputMock: jest.SpiedFunction<typeof core.getInput>
 let setFailedMock: jest.SpiedFunction<typeof core.setFailed>
 let setOutputMock: jest.SpiedFunction<typeof core.setOutput>
+let xMock: jest.SpiedFunction<typeof XAPI.X>
 
 describe('action', () => {
   beforeEach(() => {
@@ -31,14 +33,15 @@ describe('action', () => {
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
+    xMock = jest.spyOn(XAPI, 'X').mockImplementation()
   })
 
   it('sets the time output', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
-      switch (name) {
-        case 'milliseconds':
-          return '500'
+    getInputMock.mockImplementation(message => {
+      switch (message) {
+        case 'message':
+          return 'whoa!!'
         default:
           return ''
       }
@@ -47,43 +50,8 @@ describe('action', () => {
     await main.run()
     expect(runMock).toHaveReturned()
 
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
-    expect(debugMock).toHaveBeenNthCalledWith(
-      2,
-      expect.stringMatching(timeRegex)
-    )
-    expect(debugMock).toHaveBeenNthCalledWith(
-      3,
-      expect.stringMatching(timeRegex)
-    )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      expect.stringMatching(timeRegex)
-    )
-    expect(errorMock).not.toHaveBeenCalled()
-  })
+    expect(xMock).toHaveBeenCalledWith('whoa!!')
 
-  it('sets a failed status', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
-      switch (name) {
-        case 'milliseconds':
-          return 'this is not a number'
-        default:
-          return ''
-      }
-    })
-
-    await main.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds not a number'
-    )
     expect(errorMock).not.toHaveBeenCalled()
   })
 })
