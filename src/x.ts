@@ -8,7 +8,7 @@ type Credentials = {
 }
 export const X = (credentials: Credentials) => {
   const api = new TwitterApi(credentials)
-  return (message: string) => {
+  return async (message: string) => {
     return api.v2.tweet(message)
   }
 }
