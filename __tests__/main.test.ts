@@ -50,8 +50,8 @@ describe('action', () => {
     await main.run()
     expect(runMock).toHaveReturned()
 
-    expect(xMock).toHaveBeenCalledWith('whoa!!')
-
+    expect(xMock).toHaveBeenCalledWith( {"accessSecret": "", "accessToken": "", "appKey": "", "appSecret": ""})
+    
     expect(errorMock).not.toHaveBeenCalled()
   })
 })
