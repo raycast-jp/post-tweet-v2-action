@@ -32208,6 +32208,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
 const x_1 = __nccwpck_require__(4075);
+const twitter_api_v2_1 = __nccwpck_require__(7491);
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -32225,8 +32226,14 @@ async function run() {
     }
     catch (error) {
         // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            core.setFailed(error.message);
+        if (error instanceof twitter_api_v2_1.ApiResponseError) {
+            core.setOutput('postFailed', `failed to post tweet: ${error.data.detail}`);
+            core.setFailed(error);
+        }
+        if (error instanceof Error) {
+            core.setOutput('postFailed', 'failed to post tweet');
+            core.setFailed(error);
+        }
     }
 }
 

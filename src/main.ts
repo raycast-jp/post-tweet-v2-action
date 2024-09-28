@@ -19,12 +19,12 @@ export async function run(): Promise<void> {
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof ApiResponseError) {
-      core.setOutput('postFailed', `failed to post tweet: ${error.data.detail}`);
-      core.setFailed(error);
+      core.setOutput('postFailed', `failed to post tweet: ${error.data.detail}`)
+      core.setFailed(error)
     }
-    if (error instanceof Error){
-      core.setOutput('postFailed', "failed to post tweet");
-      core.setFailed(error);
+    if (error instanceof Error) {
+      core.setOutput('postFailed', 'failed to post tweet')
+      core.setFailed(error)
     }
   }
 }
