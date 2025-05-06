@@ -2516,7 +2516,7 @@ class RequestHandlerHelper {
         return !this.requestData.compression || this.requestData.compression === 'identity';
     }
     isFormEncodedEndpoint() {
-        return this.requestData.url.href.startsWith('https://api.twitter.com/oauth/');
+        return this.requestData.url.href.startsWith('https://api.x.com/oauth/');
     }
     /* Error helpers */
     createRequestError(error) {
@@ -3247,7 +3247,7 @@ class RequestParamHelpers {
             // Twitter API v2 has JSON-encoded requests for everything else
             return 'json';
         }
-        if (url.hostname === 'upload.twitter.com') {
+        if (url.hostname === 'upload.x.com') {
             if (url.pathname === '/1.1/media/upload.json') {
                 return 'form-data';
             }
@@ -3346,7 +3346,7 @@ class RequestParamHelpers {
     }
     /**
      * Replace URL parameters available in pathname, like `:id`, with data given in `parameters`:
-     * `https://twitter.com/:id.json` + `{ id: '20' }` => `https://twitter.com/20.json`
+     * `https://x.com/:id.json` + `{ id: '20' }` => `https://x.com/20.json`
      */
     static applyRequestParametersToUrl(url, parameters) {
         url.pathname = url.pathname.replace(/:([A-Z_-]+)/ig, (fullMatch, paramName) => {
@@ -3736,8 +3736,8 @@ class TwitterApiReadOnly extends client_base_1.default {
      * ```
      */
     async generateAuthLink(oauth_callback = 'oob', { authAccessType, linkMode = 'authenticate', forceLogin, screenName, } = {}) {
-        const oauthResult = await this.post('https://api.twitter.com/oauth/request_token', { oauth_callback, x_auth_access_type: authAccessType });
-        let url = `https://api.twitter.com/oauth/${linkMode}?oauth_token=${encodeURIComponent(oauthResult.oauth_token)}`;
+        const oauthResult = await this.post('https://api.x.com/oauth/request_token', { oauth_callback, x_auth_access_type: authAccessType });
+        let url = `https://api.x.com/oauth/${linkMode}?oauth_token=${encodeURIComponent(oauthResult.oauth_token)}`;
         if (forceLogin !== undefined) {
             url += `&force_login=${encodeURIComponent(forceLogin)}`;
         }
@@ -3781,7 +3781,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         const tokens = this.getActiveTokens();
         if (tokens.type !== 'oauth-1.0a')
             throw new Error('You must setup TwitterApi instance with consumer keys to accept OAuth 1.0 login');
-        const oauth_result = await this.post('https://api.twitter.com/oauth/access_token', { oauth_token: tokens.accessToken, oauth_verifier });
+        const oauth_result = await this.post('https://api.x.com/oauth/access_token', { oauth_token: tokens.accessToken, oauth_verifier });
         const client = new _1.default({
             appKey: tokens.appKey,
             appSecret: tokens.appSecret,
@@ -3814,7 +3814,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('You must setup TwitterApi instance with consumer keys to accept app-only login');
         // Create a client with Basic authentication
         const basicClient = new _1.default({ username: tokens.appKey, password: tokens.appSecret }, this._requestMaker.clientSettings);
-        const res = await basicClient.post('https://api.twitter.com/oauth2/token', { grant_type: 'client_credentials' });
+        const res = await basicClient.post('https://api.x.com/oauth2/token', { grant_type: 'client_credentials' });
         // New object with Bearer token
         return new _1.default(res.access_token, this._requestMaker.clientSettings);
     }
@@ -3825,7 +3825,7 @@ class TwitterApiReadOnly extends client_base_1.default {
      * - **You can only use v2 API endpoints with this authentication method.**
      * - **You need to specify which scope you want to have when you create your auth link. Make sure it matches your needs.**
      *
-     * See https://developer.twitter.com/en/docs/authentication/oauth-2-0/user-access-token for details.
+     * See https://developer.x.com/en/docs/authentication/oauth-2-0/user-access-token for details.
      *
      * ```ts
      * // Instantiate TwitterApi with client ID
@@ -3852,7 +3852,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         const codeChallenge = oauth2_helper_1.OAuth2Helper.getCodeChallengeFromVerifier(codeVerifier);
         const rawScope = (_b = options.scope) !== null && _b !== void 0 ? _b : '';
         const scope = Array.isArray(rawScope) ? rawScope.join(' ') : rawScope;
-        const url = new URL('https://twitter.com/i/oauth2/authorize');
+        const url = new URL('https://x.com/i/oauth2/authorize');
         const query = {
             response_type: 'code',
             client_id: this._requestMaker.clientId,
@@ -3907,7 +3907,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        const accessTokenResult = await this.post('https://api.twitter.com/2/oauth2/token', {
+        const accessTokenResult = await this.post('https://api.x.com/2/oauth2/token', {
             code,
             code_verifier: codeVerifier,
             redirect_uri: redirectUri,
@@ -3932,7 +3932,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        const accessTokenResult = await this.post('https://api.twitter.com/2/oauth2/token', {
+        const accessTokenResult = await this.post('https://api.x.com/2/oauth2/token', {
             refresh_token: refreshToken,
             grant_type: 'refresh_token',
             client_id: this._requestMaker.clientId,
@@ -3951,7 +3951,7 @@ class TwitterApiReadOnly extends client_base_1.default {
             throw new Error('Twitter API instance is not initialized with client ID. ' +
                 'Please build an instance with: new TwitterApi({ clientId: \'<yourClientId>\' })');
         }
-        return await this.post('https://api.twitter.com/2/oauth2/revoke', {
+        return await this.post('https://api.x.com/2/oauth2/revoke', {
             client_id: this._requestMaker.clientId,
             client_secret: this._requestMaker.clientSecret,
             token,
@@ -4021,11 +4021,11 @@ exports["default"] = TwitterApiReadWrite;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.API_V1_1_STREAM_PREFIX = exports.API_V1_1_UPLOAD_PREFIX = exports.API_V1_1_PREFIX = exports.API_V2_LABS_PREFIX = exports.API_V2_PREFIX = void 0;
-exports.API_V2_PREFIX = 'https://api.twitter.com/2/';
-exports.API_V2_LABS_PREFIX = 'https://api.twitter.com/labs/2/';
-exports.API_V1_1_PREFIX = 'https://api.twitter.com/1.1/';
-exports.API_V1_1_UPLOAD_PREFIX = 'https://upload.twitter.com/1.1/';
-exports.API_V1_1_STREAM_PREFIX = 'https://stream.twitter.com/1.1/';
+exports.API_V2_PREFIX = 'https://api.x.com/2/';
+exports.API_V2_LABS_PREFIX = 'https://api.x.com/labs/2/';
+exports.API_V1_1_PREFIX = 'https://api.x.com/1.1/';
+exports.API_V1_1_UPLOAD_PREFIX = 'https://upload.x.com/1.1/';
+exports.API_V1_1_STREAM_PREFIX = 'https://stream.x.com/1.1/';
 
 
 /***/ }),
@@ -6211,22 +6211,22 @@ var EApiV1ErrorCode;
 var EApiV2ErrorCode;
 (function (EApiV2ErrorCode) {
     // Request errors
-    EApiV2ErrorCode["InvalidRequest"] = "https://api.twitter.com/2/problems/invalid-request";
-    EApiV2ErrorCode["ClientForbidden"] = "https://api.twitter.com/2/problems/client-forbidden";
-    EApiV2ErrorCode["UnsupportedAuthentication"] = "https://api.twitter.com/2/problems/unsupported-authentication";
+    EApiV2ErrorCode["InvalidRequest"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#invalid-request";
+    EApiV2ErrorCode["ClientForbidden"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#client-forbidden";
+    EApiV2ErrorCode["UnsupportedAuthentication"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#unsupported-authentication";
     // Stream rules errors
-    EApiV2ErrorCode["InvalidRules"] = "https://api.twitter.com/2/problems/invalid-rules";
-    EApiV2ErrorCode["TooManyRules"] = "https://api.twitter.com/2/problems/rule-cap";
-    EApiV2ErrorCode["DuplicatedRules"] = "https://api.twitter.com/2/problems/duplicate-rules";
+    EApiV2ErrorCode["InvalidRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#invalid-rules";
+    EApiV2ErrorCode["TooManyRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#rule-cap";
+    EApiV2ErrorCode["DuplicatedRules"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#duplicate-rules";
     // Twitter errors
-    EApiV2ErrorCode["RateLimitExceeded"] = "https://api.twitter.com/2/problems/usage-capped";
-    EApiV2ErrorCode["ConnectionError"] = "https://api.twitter.com/2/problems/streaming-connection";
-    EApiV2ErrorCode["ClientDisconnected"] = "https://api.twitter.com/2/problems/client-disconnected";
-    EApiV2ErrorCode["TwitterDisconnectedYou"] = "https://api.twitter.com/2/problems/operational-disconnect";
+    EApiV2ErrorCode["RateLimitExceeded"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#usage-capped";
+    EApiV2ErrorCode["ConnectionError"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#streaming-connection";
+    EApiV2ErrorCode["ClientDisconnected"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#client-disconnected";
+    EApiV2ErrorCode["TwitterDisconnectedYou"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#operational-disconnect";
     // Resource errors
-    EApiV2ErrorCode["ResourceNotFound"] = "https://api.twitter.com/2/problems/resource-not-found";
-    EApiV2ErrorCode["ResourceUnauthorized"] = "https://api.twitter.com/2/problems/not-authorized-for-resource";
-    EApiV2ErrorCode["DisallowedResource"] = "https://api.twitter.com/2/problems/disallowed-resource";
+    EApiV2ErrorCode["ResourceNotFound"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#resource-not-found";
+    EApiV2ErrorCode["ResourceUnauthorized"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#not-authorized-for-resource";
+    EApiV2ErrorCode["DisallowedResource"] = "https://developer.x.com/en/support/x-api/error-troubleshooting#disallowed-resource";
 })(EApiV2ErrorCode = exports.EApiV2ErrorCode || (exports.EApiV2ErrorCode = {}));
 
 
@@ -6581,7 +6581,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Sending and receiving events
     /**
      * Publishes a new message_create event resulting in a Direct Message sent to a specified user from the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/new-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/new-event
      */
     sendDm({ recipient_id, custom_profile_id, ...params }) {
         const args = {
@@ -6603,7 +6603,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Returns a single Direct Message event by the given id.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/get-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/get-event
      */
     getDmEvent(id) {
         return this.get('direct_messages/events/show.json', { id });
@@ -6611,7 +6611,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Deletes the direct message specified in the required ID parameter.
      * The authenticating user must be the recipient of the specified direct message.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/delete-message-event
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/delete-message-event
      */
     deleteDm(id) {
         return this.delete('direct_messages/events/destroy.json', { id });
@@ -6620,7 +6620,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
      * Returns all Direct Message events (both sent and received) within the last 30 days.
      * Sorted in reverse-chronological order.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
      */
     async listDmEvents(args = {}) {
         const queryParams = { ...args };
@@ -6635,7 +6635,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Welcome messages (events)
     /**
      * Creates a new Welcome Message that will be stored and sent in the future from the authenticating user in defined circumstances.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message
      */
     newWelcomeDm(name, data) {
         const args = {
@@ -6650,14 +6650,14 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Returns a Welcome Message by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message
      */
     getWelcomeDm(id) {
         return this.get('direct_messages/welcome_messages/show.json', { id });
     }
     /**
      * Deletes a Welcome Message by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message
      */
     deleteWelcomeDm(id) {
         return this.delete('direct_messages/welcome_messages/destroy.json', { id });
@@ -6665,7 +6665,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     /**
      * Updates a Welcome Message by the given ID.
      * Updates to the welcome_message object are atomic.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/update-welcome-message
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/update-welcome-message
      */
     updateWelcomeDm(id, data) {
         const args = { message_data: data };
@@ -6678,7 +6678,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
      * Returns all Direct Message events (both sent and received) within the last 30 days.
      * Sorted in reverse-chronological order.
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/sending-and-receiving/api-reference/list-events
      */
     async listWelcomeDms(args = {}) {
         const queryParams = { ...args };
@@ -6693,7 +6693,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Welcome message (rules)
     /**
      * Creates a new Welcome Message Rule that determines which Welcome Message will be shown in a given conversation.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/new-welcome-message-rule
      */
     newWelcomeDmRule(welcomeMessageId) {
         return this.post('direct_messages/welcome_messages/rules/new.json', {
@@ -6704,21 +6704,21 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Returns a Welcome Message Rule by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/get-welcome-message-rule
      */
     getWelcomeDmRule(id) {
         return this.get('direct_messages/welcome_messages/rules/show.json', { id });
     }
     /**
      * Deletes a Welcome Message Rule by the given id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message-rule
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/delete-welcome-message-rule
      */
     deleteWelcomeDmRule(id) {
         return this.delete('direct_messages/welcome_messages/rules/destroy.json', { id });
     }
     /**
      * Retrieves all welcome DM rules for this account.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/list-welcome-message-rules
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/welcome-messages/api-reference/list-welcome-message-rules
      */
     async listWelcomeDmRules(args = {}) {
         const queryParams = { ...args };
@@ -6746,7 +6746,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Read indicator
     /**
      * Marks a message as read in the recipient’s Direct Message conversation view with the sender.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-read-receipt
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-read-receipt
      */
     markDmAsRead(lastEventId, recipientId) {
         return this.post('direct_messages/mark_read.json', {
@@ -6756,7 +6756,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     }
     /**
      * Displays a visual typing indicator in the recipient’s Direct Message conversation view with the sender.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-typing-indicator
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/typing-indicator-and-read-receipts/api-reference/new-typing-indicator
      */
     indicateDmTyping(recipientId) {
         return this.post('direct_messages/indicate_typing.json', {
@@ -6766,7 +6766,7 @@ class TwitterApiv1 extends client_v1_write_1.default {
     // Part: Images
     /**
      * Get a single image attached to a direct message. TwitterApi client must be logged with OAuth 1.0a.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/direct-messages/message-attachments/guides/retrieving-media
+     * https://developer.x.com/en/docs/twitter-api/v1/direct-messages/message-attachments/guides/retrieving-media
      */
     async downloadDmImage(urlOrDm) {
         if (typeof urlOrDm !== 'string') {
@@ -6819,7 +6819,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Tweets */
     /**
      * Returns a single Tweet, specified by the id parameter. The Tweet's author will also be embedded within the Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-show-id
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-show-id
      */
     singleTweet(tweetId, options = {}) {
         return this.get('statuses/show.json', { tweet_mode: 'extended', id: tweetId, ...options });
@@ -6830,19 +6830,19 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a single Tweet, specified by either a Tweet web URL or the Tweet ID, in an oEmbed-compatible format.
      * The returned HTML snippet will be automatically recognized as an Embedded Tweet when Twitter's widget JavaScript is included on the page.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-oembed
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-statuses-oembed
      */
     oembedTweet(tweetId, options = {}) {
         return this.get('oembed', {
-            url: `https://twitter.com/i/statuses/${tweetId}`,
+            url: `https://x.com/i/statuses/${tweetId}`,
             ...options,
-        }, { prefix: 'https://publish.twitter.com/' });
+        }, { prefix: 'https://publish.x.com/' });
     }
     /* Tweets timelines */
     /**
      * Returns a collection of the most recent Tweets and Retweets posted by the authenticating user and the users they follow.
      * The home timeline is central to how most users interact with the Twitter service.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
      */
     async homeTimeline(options = {}) {
         const queryParams = {
@@ -6859,8 +6859,8 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the 20 most recent mentions (Tweets containing a users's @screen_name) for the authenticating user.
-     * The timeline returned is the equivalent of the one seen when you view your mentions on twitter.com.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-mentions_timeline
+     * The timeline returned is the equivalent of the one seen when you view your mentions on x.com.
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-mentions_timeline
      */
     async mentionTimeline(options = {}) {
         const queryParams = {
@@ -6878,7 +6878,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a collection of the most recent Tweets posted by the user indicated by the user_id parameters.
      * User timelines belonging to protected users may only be requested when the authenticated user either "owns" the timeline or is an approved follower of the owner.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
      */
     async userTimeline(userId, options = {}) {
         const queryParams = {
@@ -6897,7 +6897,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a collection of the most recent Tweets posted by the user indicated by the screen_name parameters.
      * User timelines belonging to protected users may only be requested when the authenticated user either "owns" the timeline or is an approved follower of the owner.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-user_timeline
      */
     async userTimelineByUsername(username, options = {}) {
         const queryParams = {
@@ -6916,7 +6916,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the most recent Tweets liked by the authenticating or specified user, 20 tweets by default.
      * Note: favorites are now known as likes.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
      */
     async favoriteTimeline(userId, options = {}) {
         const queryParams = {
@@ -6935,7 +6935,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the most recent Tweets liked by the authenticating or specified user, 20 tweets by default.
      * Note: favorites are now known as likes.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/get-favorites-list
      */
     async favoriteTimelineByUsername(username, options = {}) {
         const queryParams = {
@@ -6955,7 +6955,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a variety of information about the user specified by the required user_id or screen_name parameter.
      * The author's most recent Tweet will be returned inline when possible.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-show
      */
     user(user) {
         return this.get('users/show.json', { tweet_mode: 'extended', ...user });
@@ -6963,7 +6963,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns fully-hydrated user objects for up to 100 users per request,
      * as specified by comma-separated values passed to the user_id and/or screen_name parameters.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup
      */
     users(query) {
         return this.get('users/lookup.json', { tweet_mode: 'extended', ...query });
@@ -6972,14 +6972,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns an HTTP 200 OK response code and a representation of the requesting user if authentication was successful;
      * returns a 401 status code and an error message if not.
      * Use this method to test if supplied user credentials are valid.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
      */
     verifyCredentials(options = {}) {
         return this.get('account/verify_credentials.json', options);
     }
     /**
      * Returns an array of user objects the authenticating user has muted.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-list
      */
     async listMutedUsers(options = {}) {
         const queryParams = {
@@ -6996,7 +6996,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids the authenticating user has muted.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/get-mutes-users-ids
      */
     async listMutedUserIds(options = {}) {
         const queryParams = {
@@ -7013,7 +7013,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of user objects of friends of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-list
      */
     async userFriendList(options = {}) {
         const queryParams = {
@@ -7029,7 +7029,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of user objects of followers of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-list
      */
     async userFollowerList(options = {}) {
         const queryParams = {
@@ -7045,7 +7045,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids of followers of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-followers-ids
      */
     async userFollowerIds(options = {}) {
         const queryParams = {
@@ -7062,7 +7062,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns an array of numeric user ids of friends of the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friends-ids
      */
     async userFollowingIds(options = {}) {
         const queryParams = {
@@ -7079,7 +7079,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Provides a simple, relevance-based search interface to public user accounts on Twitter.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-search
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-users-search
      */
     async searchUsers(query, options = {}) {
         const queryParams = {
@@ -7099,28 +7099,28 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Friendship API */
     /**
      * Returns detailed information about the relationship between two arbitrary users.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-show
      */
     friendship(sources) {
         return this.get('friendships/show.json', sources);
     }
     /**
      * Returns the relationships of the authenticating user to the comma-separated list of up to 100 screen_names or user_ids provided.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup
      */
     friendships(friendships) {
         return this.get('friendships/lookup.json', friendships);
     }
     /**
      * Returns a collection of user_ids that the currently authenticated user does not want to receive retweets from.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-no_retweets-ids
      */
     friendshipsNoRetweets() {
         return this.get('friendships/no_retweets/ids.json', { stringify_ids: true });
     }
     /**
      * Returns a collection of numeric IDs for every user who has a pending request to follow the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-incoming
      */
     async friendshipsIncoming(options = {}) {
         const queryParams = {
@@ -7137,7 +7137,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a collection of numeric IDs for every protected user for whom the authenticating user has a pending follow request.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/get-friendships-outgoing
      */
     async friendshipsOutgoing(options = {}) {
         const queryParams = {
@@ -7155,7 +7155,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Account/user API */
     /**
      * Get current account settings for authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
      */
     accountSettings() {
         return this.get('account/settings.json');
@@ -7163,7 +7163,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns a map of the available size variations of the specified user's profile banner.
      * If the user has not uploaded a profile banner, a HTTP 404 will be served instead.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-users-profile_banner
      */
     userProfileBannerSizes(params) {
         return this.get('users/profile_banner.json', params);
@@ -7171,7 +7171,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Lists */
     /**
      * Returns the specified list. Private lists will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-show
      */
     list(options) {
         return this.get('lists/show.json', { tweet_mode: 'extended', ...options });
@@ -7179,14 +7179,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns all lists the authenticating or specified user subscribes to, including their own.
      * If no user is given, the authenticating user is used.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-list
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-list
      */
     lists(options = {}) {
         return this.get('lists/list.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Returns the members of the specified list. Private list members will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members
      */
     async listMembers(options = {}) {
         const queryParams = {
@@ -7203,7 +7203,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Check if the specified user is a member of the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-members-show
      */
     listGetMember(options) {
         return this.get('lists/members/show.json', { tweet_mode: 'extended', ...options });
@@ -7211,7 +7211,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the lists the specified user has been added to.
      * If user_id or screen_name are not provided, the memberships for the authenticating user are returned.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-memberships
      */
     async listMemberships(options = {}) {
         const queryParams = {
@@ -7228,7 +7228,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the lists owned by the specified Twitter user. Private lists will only be shown if the authenticated user is also the owner of the lists.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
      */
     async listOwnerships(options = {}) {
         const queryParams = {
@@ -7245,7 +7245,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a timeline of tweets authored by members of the specified list. Retweets are included by default.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-statuses
      */
     async listStatuses(options) {
         const queryParams = {
@@ -7262,7 +7262,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns the subscribers of the specified list. Private list subscribers will only be shown if the authenticated user owns the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers
      */
     async listSubscribers(options = {}) {
         const queryParams = {
@@ -7279,7 +7279,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     }
     /**
      * Check if the specified user is a subscriber of the specified list. Returns the user if they are a subscriber.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscribers-show
      */
     listGetSubscriber(options) {
         return this.get('lists/subscribers/show.json', { tweet_mode: 'extended', ...options });
@@ -7287,7 +7287,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Obtain a collection of the lists the specified user is subscribed to, 20 lists per page by default.
      * Does not include the user's own lists.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/get-lists-subscriptions
      */
     async listSubscriptions(options = {}) {
         const queryParams = {
@@ -7306,7 +7306,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * The STATUS command (this method) is used to periodically poll for updates of media processing operation.
      * After the STATUS command response returns succeeded, you can move on to the next step which is usually create Tweet with media_id.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/get-media-upload-status
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/get-media-upload-status
      */
     mediaInfo(mediaId) {
         return this.get('media/upload.json', {
@@ -7336,7 +7336,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
         return streamClient.getStream('statuses/sample.json', params, { autoConnect });
     }
     /**
-     * Create a client that is prefixed with `https//stream.twitter.com` instead of classic API URL.
+     * Create a client that is prefixed with `https//stream.x.com` instead of classic API URL.
      */
     get stream() {
         const copiedClient = new client_v1_1.default(this);
@@ -7347,7 +7347,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Returns the top 50 trending topics for a specific id, if trending information is available for it.
      * Note: The id parameter for this endpoint is the "where on earth identifier" or WOEID, which is a legacy identifier created by Yahoo and has been deprecated.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/trends-for-location/api-reference/get-trends-place
      */
     trendsByPlace(woeId, options = {}) {
         return this.get('trends/place.json', { id: woeId, ...options });
@@ -7356,14 +7356,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns the locations that Twitter has trending topic information for.
      * The response is an array of "locations" that encode the location's WOEID
      * and some other human-readable information such as a canonical name and country the location belongs in.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-available
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-available
      */
     trendsAvailable() {
         return this.get('trends/available.json');
     }
     /**
      * Returns the locations that Twitter has trending topic information for, closest to a specified location.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
+     * https://developer.x.com/en/docs/twitter-api/v1/trends/locations-with-trending-topics/api-reference/get-trends-closest
      */
     trendsClosest(lat, long) {
         return this.get('trends/closest.json', { lat, long });
@@ -7371,7 +7371,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /* Geo API */
     /**
      * Returns all the information about a known place.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/place-information/api-reference/get-geo-id-place_id
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/place-information/api-reference/get-geo-id-place_id
      */
     geoPlace(placeId) {
         return this.get('geo/id/:place_id.json', undefined, { params: { place_id: placeId } });
@@ -7379,7 +7379,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Search for places that can be attached to a Tweet via POST statuses/update.
      * This request will return a list of all the valid places that can be used as the place_id when updating a status.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-search
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-search
      */
     geoSearch(options) {
         return this.get('geo/search.json', options);
@@ -7387,7 +7387,7 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
     /**
      * Given a latitude and a longitude, searches for up to 20 places that can be used as a place_id when updating a status.
      * This request is an informative call and will deliver generalized results about geography.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-reverse_geocode
+     * https://developer.x.com/en/docs/twitter-api/v1/geo/places-near-location/api-reference/get-geo-reverse_geocode
      */
     geoReverseGeoCode(options) {
         return this.get('geo/reverse_geocode.json', options);
@@ -7397,14 +7397,14 @@ class TwitterApiv1ReadOnly extends client_subclient_1.default {
      * Returns the current rate limits for methods belonging to the specified resource families.
      * Each API resource belongs to a "resource family" which is indicated in its method documentation.
      * The method's resource family can be determined from the first component of the path after the resource version.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status
+     * https://developer.x.com/en/docs/twitter-api/v1/developer-utilities/rate-limit-status/api-reference/get-application-rate_limit_status
      */
     rateLimitStatuses(...resources) {
         return this.get('application/rate_limit_status.json', { resources });
     }
     /**
      * Returns the list of languages supported by Twitter along with the language code supported by Twitter.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/developer-utilities/supported-languages/api-reference/get-help-languages
+     * https://developer.x.com/en/docs/twitter-api/v1/developer-utilities/supported-languages/api-reference/get-help-languages
      */
     supportedLanguages() {
         return this.get('help/languages.json');
@@ -7471,7 +7471,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Tweet API */
     /**
      * Post a new tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     tweet(status, payload = {}) {
         const queryParams = {
@@ -7483,15 +7483,15 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Quote an existing tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     async quote(status, quotingStatusId, payload = {}) {
-        const url = 'https://twitter.com/i/statuses/' + quotingStatusId;
+        const url = 'https://x.com/i/statuses/' + quotingStatusId;
         return this.tweet(status, { ...payload, attachment_url: url });
     }
     /**
      * Post a series of tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     async tweetThread(tweets) {
         const postedTweets = [];
@@ -7514,7 +7514,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Reply to an existing tweet. Shortcut to `.tweet` with tweaked parameters.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
      */
     reply(status, in_reply_to_status_id, payload = {}) {
         return this.tweet(status, {
@@ -7525,7 +7525,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Delete an existing tweet belonging to you.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-destroy-id
+     * https://developer.x.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-destroy-id
      */
     deleteTweet(tweetId) {
         return this.post('statuses/destroy/:id.json', { tweet_mode: 'extended' }, { params: { id: tweetId } });
@@ -7534,28 +7534,28 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /**
      * Report the specified user as a spam account to Twitter.
      * Additionally, optionally performs the equivalent of POST blocks/create on behalf of the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/mute-block-report-users/api-reference/post-users-report_spam
      */
     reportUserAsSpam(options) {
         return this.post('users/report_spam.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Turn on/off Retweets and device notifications from the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-update
      */
     updateFriendship(options) {
         return this.post('friendships/update.json', options);
     }
     /**
      * Follow the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
      */
     createFriendship(options) {
         return this.post('friendships/create.json', options);
     }
     /**
      * Unfollow the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy
      */
     destroyFriendship(options) {
         return this.post('friendships/destroy.json', options);
@@ -7563,21 +7563,21 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Account API */
     /**
      * Update current account settings for authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/get-account-settings
      */
     updateAccountSettings(options) {
         return this.post('account/settings.json', options);
     }
     /**
      * Sets some values that users are able to set under the "Account" tab of their settings page.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile
      */
     updateAccountProfile(options) {
         return this.post('account/update_profile.json', options);
     }
     /**
      * Uploads a profile banner on behalf of the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_banner
      */
     async updateAccountProfileBanner(file, options = {}) {
         const queryParams = {
@@ -7588,7 +7588,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Updates the authenticating user's profile image.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile_image
      */
     async updateAccountProfileImage(file, options = {}) {
         const queryParams = {
@@ -7600,7 +7600,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Removes the uploaded profile banner for the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/manage-account-settings/api-reference/post-account-remove_profile_banner
      */
     removeAccountProfileBanner() {
         return this.post('account/remove_profile_banner.json');
@@ -7608,21 +7608,21 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /* Lists */
     /**
      * Creates a new list for the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-create
      */
     createList(options) {
         return this.post('lists/create.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Updates the specified list. The authenticated user must own the list to be able to update it.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-update
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-update
      */
     updateList(options) {
         return this.post('lists/update.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Deletes the specified list. The authenticated user must own the list to be able to destroy it.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-destroy
      */
     removeList(options) {
         return this.post('lists/destroy.json', { tweet_mode: 'extended', ...options });
@@ -7631,7 +7631,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Adds multiple members to a list, by specifying a comma-separated list of member ids or screen names.
      * If you add a single `user_id` or `screen_name`, it will target `lists/members/create.json`, otherwise
      * it will target `lists/members/create_all.json`.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-create_all
      */
     addListMembers(options) {
         const hasMultiple = (options.user_id && (0, helpers_1.hasMultipleItems)(options.user_id)) || (options.screen_name && (0, helpers_1.hasMultipleItems)(options.screen_name));
@@ -7642,7 +7642,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Removes multiple members to a list, by specifying a comma-separated list of member ids or screen names.
      * If you add a single `user_id` or `screen_name`, it will target `lists/members/destroy.json`, otherwise
      * it will target `lists/members/destroy_all.json`.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all
      */
     removeListMembers(options) {
         const hasMultiple = (options.user_id && (0, helpers_1.hasMultipleItems)(options.user_id)) || (options.screen_name && (0, helpers_1.hasMultipleItems)(options.screen_name));
@@ -7651,14 +7651,14 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     }
     /**
      * Subscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-create
      */
     subscribeToList(options) {
         return this.post('lists/subscribers/create.json', { tweet_mode: 'extended', ...options });
     }
     /**
      * Unsubscribes the authenticated user of the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy
+     * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-subscribers-destroy
      */
     unsubscribeOfList(options) {
         return this.post('lists/subscribers/destroy.json', { tweet_mode: 'extended', ...options });
@@ -7667,7 +7667,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
     /**
      * This endpoint can be used to provide additional information about the uploaded media_id.
      * This feature is currently only supported for images and GIFs.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-metadata-create
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-metadata-create
      */
     createMediaMetadata(mediaId, metadata) {
         return this.post('media/metadata/create.json', { media_id: mediaId, ...metadata }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
@@ -7676,14 +7676,14 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
      * Use this endpoint to associate uploaded subtitles to an uploaded video. You can associate subtitles to video before or after Tweeting.
      * **To obtain subtitle media ID, you must upload each subtitle file separately using `.uploadMedia()` method.**
      *
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-create
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-create
      */
     createMediaSubtitles(mediaId, subtitles) {
         return this.post('media/subtitles/create.json', { media_id: mediaId, media_category: 'TweetVideo', subtitle_info: { subtitles } }, { prefix: globals_1.API_V1_1_UPLOAD_PREFIX, forceBodyMode: 'json' });
     }
     /**
      * Use this endpoint to dissociate subtitles from a video and delete the subtitles. You can dissociate subtitles from a video before or after Tweeting.
-     * https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-delete
+     * https://developer.x.com/en/docs/twitter-api/v1/media/upload-media/api-reference/post-media-subtitles-delete
      */
     deleteMediaSubtitles(mediaId, ...languages) {
         return this.post('media/subtitles/delete.json', {
@@ -8228,7 +8228,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * since the first Tweet was created March 26, 2006.
      *
      * This endpoint is only available to those users who have been approved for the Academic Research product track.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
+     * https://developer.x.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
      */
     async searchAll(query, options = {}) {
         const queryParams = { ...options, query };
@@ -8242,7 +8242,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single Tweet specified by the requested ID.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
+     * https://developer.x.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -8251,7 +8251,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about tweets specified by list of IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -8261,7 +8261,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * The recent Tweet counts endpoint returns count of Tweets from the last seven days that match a search query.
      * OAuth2 Bearer auth only.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
+     * https://developer.x.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-recent
      */
     tweetCountRecent(query, options = {}) {
         return this.get('tweets/counts/recent', { query, ...options });
@@ -8272,7 +8272,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * since the first Tweet was created March 26, 2006.
      * OAuth2 Bearer auth only.
      * **This endpoint has pagination, yet it is not supported by bundled paginators. Use `next_token` to fetch next page.**
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
+     * https://developer.x.com/en/docs/twitter-api/tweets/counts/api-reference/get-tweets-counts-all
      */
     tweetCountAll(query, options = {}) {
         return this.get('tweets/counts/all', { query, ...options });
@@ -8314,7 +8314,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * Allows you to retrieve a collection of the most recent Tweets and Retweets posted by you and users you follow, also known as home timeline.
      * This endpoint returns up to the last 3200 Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-reverse-chronological
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-reverse-chronological
      *
      * OAuth 2 scopes: `tweet.read` `users.read`
      */
@@ -8336,7 +8336,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * Returns Tweets composed by a single user, specified by the requested user ID.
      * By default, the most recent ten Tweets are returned per request.
      * Using pagination, the most recent 3,200 Tweets can be retrieved.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-tweets
      */
     async userTimeline(userId, options = {}) {
         const initialRq = await this.get('users/:id/tweets', options, {
@@ -8355,7 +8355,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * Returns Tweets mentioning a single user specified by the requested user ID.
      * By default, the most recent ten Tweets are returned per request.
      * Using pagination, up to the most recent 800 Tweets can be retrieved.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions
+     * https://developer.x.com/en/docs/twitter-api/tweets/timelines/api-reference/get-users-id-mentions
      */
     async userMentionTimeline(userId, options = {}) {
         const initialRq = await this.get('users/:id/mentions', options, {
@@ -8372,7 +8372,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns Quote Tweets for a Tweet specified by the requested Tweet ID.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
      *
      * OAuth2 scopes: `users.read` `tweet.read`
      */
@@ -8392,7 +8392,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Bookmarks */
     /**
      * Allows you to get information about a authenticated user’s 800 most recent bookmarked Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/get-users-id-bookmarks
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.read`
      */
@@ -8413,7 +8413,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Users */
     /**
      * Returns information about an authorized user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-me
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-me
      *
      * OAuth2 scopes: `tweet.read` & `users.read`
      */
@@ -8422,14 +8422,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single user specified by the requested ID.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-id
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-id
      */
     user(userId, options = {}) {
         return this.get('users/:id', options, { params: { id: userId } });
     }
     /**
      * Returns a variety of information about one or more users specified by the requested IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users
      */
     users(userIds, options = {}) {
         const ids = Array.isArray(userIds) ? userIds.join(',') : userIds;
@@ -8437,14 +8437,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a variety of information about a single user specified by their username.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by-username-username
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by-username-username
      */
     userByUsername(username, options = {}) {
         return this.get('users/by/username/:username', options, { params: { username } });
     }
     /**
      * Returns a variety of information about one or more users specified by their usernames.
-     * https://developer.twitter.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by
+     * https://developer.x.com/en/docs/twitter-api/users/lookup/api-reference/get-users-by
      *
      * OAuth2 scope: `users.read`, `tweet.read`
      */
@@ -8484,7 +8484,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Allows you to get information about a user’s liked Tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/get-users-id-liked_tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/get-users-id-liked_tweets
      */
     async userLikedTweets(userId, options = {}) {
         const params = { id: userId };
@@ -8499,7 +8499,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are blocked by the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/get-users-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/get-users-blocking
      */
     async userBlockingUsers(userId, options = {}) {
         const params = { id: userId };
@@ -8514,7 +8514,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are muted by the authenticating user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/get-users-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/get-users-muting
      */
     async userMutingUsers(userId, options = {}) {
         const params = { id: userId };
@@ -8530,14 +8530,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Lists */
     /**
      * Returns the details of a specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-lists-id
      */
     list(id, options = {}) {
         return this.get('lists/:id', options, { params: { id } });
     }
     /**
      * Returns all Lists owned by the specified user.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-users-id-owned_lists
+     * https://developer.x.com/en/docs/twitter-api/lists/list-lookup/api-reference/get-users-id-owned_lists
      */
     async listsOwned(userId, options = {}) {
         const params = { id: userId };
@@ -8552,7 +8552,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns all Lists a specified user is a member of.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/get-users-id-list_memberships
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/get-users-id-list_memberships
      */
     async listMemberships(userId, options = {}) {
         const params = { id: userId };
@@ -8567,7 +8567,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns all Lists a specified user follows.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-follows/api-reference/get-users-id-followed_lists
+     * https://developer.x.com/en/docs/twitter-api/lists/list-follows/api-reference/get-users-id-followed_lists
      */
     async listFollowed(userId, options = {}) {
         const params = { id: userId };
@@ -8582,7 +8582,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of Tweets from the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-tweets/api-reference/get-lists-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/lists/list-tweets/api-reference/get-lists-id-tweets
      */
     async listTweets(listId, options = {}) {
         const params = { id: listId };
@@ -8597,7 +8597,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are members of the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/get-lists-id-members
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/get-lists-id-members
      */
     async listMembers(listId, options = {}) {
         const params = { id: listId };
@@ -8612,7 +8612,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns a list of users who are followers of the specified List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-follows/api-reference/get-lists-id-followers
+     * https://developer.x.com/en/docs/twitter-api/lists/list-follows/api-reference/get-lists-id-followers
      */
     async listFollowers(listId, options = {}) {
         const params = { id: listId };
@@ -8633,7 +8633,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_events
      */
     async listDmEvents(options = {}) {
         const initialRq = await this.get('dm_events', options, { fullResponse: true });
@@ -8650,7 +8650,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
      */
     async listDmEventsWithParticipant(participantId, options = {}) {
         const params = { participant_id: participantId };
@@ -8669,7 +8669,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      *
      * OAuth 2 scopes: `dm.read`, `tweet.read`, `user.read`
      *
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/lookup/api-reference/get-dm_conversations-dm_conversation_id-dm_events
      */
     async listDmEventsOfConversation(dmConversationId, options = {}) {
         const params = { dm_conversation_id: dmConversationId };
@@ -8685,7 +8685,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Spaces */
     /**
      * Get a single space by ID.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -8694,7 +8694,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Get spaces using their IDs.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -8703,7 +8703,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Get spaces using their creator user ID(s). (no pagination available)
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-by-creator-ids
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-by-creator-ids
      *
      * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
      */
@@ -8712,7 +8712,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Search through spaces using multiple params. (no pagination available)
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/search/api-reference/get-spaces-search
+     * https://developer.x.com/en/docs/twitter-api/spaces/search/api-reference/get-spaces-search
      */
     searchSpaces(options) {
         return this.get('spaces/search', options);
@@ -8723,7 +8723,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     *
     * **OAuth 2.0 Access Token required**
     *
-    * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
+    * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-buyers
     *
     * OAuth2 scopes: `tweet.read`, `users.read`, `space.read`.
     */
@@ -8732,7 +8732,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Returns Tweets shared in the requested Spaces.
-     * https://developer.twitter.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-tweets
+     * https://developer.x.com/en/docs/twitter-api/spaces/lookup/api-reference/get-spaces-id-tweets
      *
      * OAuth2 scope: `users.read`, `tweet.read`, `space.read`
      */
@@ -8744,7 +8744,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     }
     /**
      * Return a list of rules currently active on the streaming endpoint, either as a list or individually.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
+     * https://developer.x.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
      */
     streamRules(options = {}) {
         return this.get('tweets/search/stream/rules', options);
@@ -8761,14 +8761,14 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /* Batch compliance */
     /**
      * Returns a list of recent compliance jobs.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs
      */
     complianceJobs(options) {
         return this.get('compliance/jobs', options);
     }
     /**
      * Get a single compliance job with the specified ID.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs-id
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs-id
      */
     complianceJob(jobId) {
         return this.get('compliance/jobs/:id', undefined, { params: { id: jobId } });
@@ -8778,7 +8778,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
      * You can run one batch job at a time. Returns the created job, but **not the job result!**.
      *
      * You can obtain the result (**after job is completed**) with `.complianceJobResult`.
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
      */
     async sendComplianceJob(jobParams) {
         const job = await this.post('compliance/jobs', { type: jobParams.type, name: jobParams.name });
@@ -8796,7 +8796,7 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
     /**
      * Get the result of a running or completed job, obtained through `.complianceJob`, `.complianceJobs` or `.sendComplianceJob`.
      * If job is still running (`in_progress`), it will await until job is completed. **This could be quite long!**
-     * https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
+     * https://developer.x.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
      */
     async complianceJobResult(job) {
         let runningJob = job;
@@ -8862,14 +8862,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Tweets */
     /**
      * Hides or unhides a reply to a Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
+     * https://developer.x.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
      */
     hideReply(tweetId, makeHidden) {
         return this.put('tweets/:id/hidden', { hidden: makeHidden }, { params: { id: tweetId } });
     }
     /**
      * Causes the user ID identified in the path parameter to Like the target Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/post-users-user_id-likes
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/post-users-user_id-likes
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -8879,7 +8879,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user or authenticated user ID to unlike a Tweet.
      * The request succeeds with no action when the user sends a request to a user they're not liking the Tweet or have already unliked the Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/delete-users-id-likes-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/likes/api-reference/delete-users-id-likes-tweet_id
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -8890,7 +8890,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Causes the user ID identified in the path parameter to Retweet the target Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/retweets/api-reference/post-users-id-retweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/retweets/api-reference/post-users-id-retweets
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -8900,7 +8900,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user or authenticated user ID to remove the Retweet of a Tweet.
      * The request succeeds with no action when the user sends a request to a user they're not Retweeting the Tweet or have already removed the Retweet of.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/retweets/api-reference/delete-users-id-retweets-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/retweets/api-reference/delete-users-id-retweets-tweet_id
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -8920,7 +8920,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Reply to a Tweet on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     reply(status, toTweetId, payload = {}) {
         var _a;
@@ -8929,14 +8929,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Quote an existing Tweet on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     quote(status, quotedTweetId, payload = {}) {
         return this.tweet(status, { ...payload, quote_tweet_id: quotedTweetId });
     }
     /**
      * Post a series of tweets.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/post-tweets
      */
     async tweetThread(tweets) {
         var _a, _b;
@@ -8960,7 +8960,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to delete a Tweet
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/delete-tweets-id
+     * https://developer.x.com/en/docs/twitter-api/tweets/manage-tweets/api-reference/delete-tweets-id
      */
     deleteTweet(tweetId) {
         return this.delete('tweets/:id', undefined, {
@@ -8972,7 +8972,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Bookmarks */
     /**
      * Causes the user ID of an authenticated user identified in the path parameter to Bookmark the target Tweet provided in the request body.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/post-users-id-bookmarks
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
      */
@@ -8982,7 +8982,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to remove a Bookmark of a Tweet.
-     * https://developer.twitter.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
+     * https://developer.x.com/en/docs/twitter-api/tweets/bookmarks/api-reference/delete-users-id-bookmarks-tweet_id
      *
      * OAuth2 scopes: `users.read` `tweet.read` `bookmark.write`
      */
@@ -8994,7 +8994,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows a user ID to follow another user.
      * If the target user does not have public Tweets, this endpoint will send a follow request.
-     * https://developer.twitter.com/en/docs/twitter-api/users/follows/api-reference/post-users-source_user_id-following
+     * https://developer.x.com/en/docs/twitter-api/users/follows/api-reference/post-users-source_user_id-following
      *
      * OAuth2 scope: `follows.write`
      *
@@ -9005,7 +9005,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user ID to unfollow another user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/follows/api-reference/delete-users-source_id-following
+     * https://developer.x.com/en/docs/twitter-api/users/follows/api-reference/delete-users-source_id-following
      *
      * OAuth2 scope: `follows.write`
      *
@@ -9019,7 +9019,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Causes the user (in the path) to block the target user.
      * The user (in the path) must match the user context authorizing the request.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/post-users-user_id-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/post-users-user_id-blocking
      *
      * **Note**: You must specify the currently logged user ID; you can obtain it through v1.1 API.
      */
@@ -9028,7 +9028,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows a user or authenticated user ID to unblock another user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/blocks/api-reference/delete-users-user_id-blocking
+     * https://developer.x.com/en/docs/twitter-api/users/blocks/api-reference/delete-users-user_id-blocking
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -9039,7 +9039,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     }
     /**
      * Allows an authenticated user ID to mute the target user.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/post-users-user_id-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/post-users-user_id-muting
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -9049,7 +9049,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Allows an authenticated user ID to unmute the target user.
      * The request succeeds with no action when the user sends a request to a user they're not muting or have already unmuted.
-     * https://developer.twitter.com/en/docs/twitter-api/users/mutes/api-reference/delete-users-user_id-muting
+     * https://developer.x.com/en/docs/twitter-api/users/mutes/api-reference/delete-users-user_id-muting
      *
      * **Note**: You must specify the currently logged user ID ; you can obtain it through v1.1 API.
      */
@@ -9061,63 +9061,63 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Lists */
     /**
      * Creates a new list for the authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-lists
      */
     createList(options) {
         return this.post('lists', options);
     }
     /**
      * Updates the specified list. The authenticated user must own the list to be able to update it.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/put-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/put-lists-id
      */
     updateList(listId, options = {}) {
         return this.put('lists/:id', options, { params: { id: listId } });
     }
     /**
      * Deletes the specified list. The authenticated user must own the list to be able to destroy it.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-lists-id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-lists-id
      */
     removeList(listId) {
         return this.delete('lists/:id', undefined, { params: { id: listId } });
     }
     /**
      * Adds a member to a list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/post-lists-id-members
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/post-lists-id-members
      */
     addListMember(listId, userId) {
         return this.post('lists/:id/members', { user_id: userId }, { params: { id: listId } });
     }
     /**
      * Remember a member to a list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/delete-lists-id-members-user_id
+     * https://developer.x.com/en/docs/twitter-api/lists/list-members/api-reference/delete-lists-id-members-user_id
      */
     removeListMember(listId, userId) {
         return this.delete('lists/:id/members/:user_id', undefined, { params: { id: listId, user_id: userId } });
     }
     /**
      * Subscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-followed-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-followed-lists
      */
     subscribeToList(loggedUserId, listId) {
         return this.post('users/:id/followed_lists', { list_id: listId }, { params: { id: loggedUserId } });
     }
     /**
      * Unsubscribes the authenticated user to the specified list.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-followed-lists-list_id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-followed-lists-list_id
      */
     unsubscribeOfList(loggedUserId, listId) {
         return this.delete('users/:id/followed_lists/:list_id', undefined, { params: { id: loggedUserId, list_id: listId } });
     }
     /**
      * Enables the authenticated user to pin a List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-pinned-lists
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/post-users-id-pinned-lists
      */
     pinList(loggedUserId, listId) {
         return this.post('users/:id/pinned_lists', { list_id: listId }, { params: { id: loggedUserId } });
     }
     /**
      * Enables the authenticated user to unpin a List.
-     * https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-pinned-lists-list_id
+     * https://developer.x.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-users-id-pinned-lists-list_id
      */
     unpinList(loggedUserId, listId) {
         return this.delete('users/:id/pinned_lists/:list_id', undefined, { params: { id: loggedUserId, list_id: listId } });
@@ -9125,7 +9125,7 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /* Direct messages */
     /**
      * Creates a Direct Message on behalf of an authenticated user, and adds it to the specified conversation.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-dm_conversation_id-messages
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-dm_conversation_id-messages
      */
     sendDmInConversation(conversationId, message) {
         return this.post('dm_conversations/:dm_conversation_id/messages', message, { params: { dm_conversation_id: conversationId } });
@@ -9133,14 +9133,14 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
     /**
      * Creates a one-to-one Direct Message and adds it to the one-to-one conversation.
      * This method either creates a new one-to-one conversation or retrieves the current conversation and adds the Direct Message to it.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-with-participant_id-messages
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations-with-participant_id-messages
      */
     sendDmToParticipant(participantId, message) {
         return this.post('dm_conversations/with/:participant_id/messages', message, { params: { participant_id: participantId } });
     }
     /**
      * Creates a new group conversation and adds a Direct Message to it on behalf of an authenticated user.
-     * https://developer.twitter.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations
+     * https://developer.x.com/en/docs/twitter-api/direct-messages/manage/api-reference/post-dm_conversations
      */
     createDmConversation(options) {
         return this.post('dm_conversations', options);
