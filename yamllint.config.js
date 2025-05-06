@@ -1,0 +1,15 @@
+export default {
+  rules: {
+    'document-end': false,
+    'document-start': {
+      level: 'warning',
+      present: false
+    },
+    'line-length': {
+      level: 'warning',
+      max: 80,
+      'allow-non-breakable-words': true,
+      'allow-non-breakable-inline-mappings': true
+    }
+  }
+}

@@ -1,17 +1,12 @@
-import eslint from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import jestPlugin from 'eslint-plugin-jest';
+import eslint from '@eslint/js'
+import tseslint from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
+import jestPlugin from 'eslint-plugin-jest'
 
 export default [
   eslint.configs.recommended,
   {
-    ignores: [
-      '**/node_modules/*',
-      '**/dist/*',
-      '**/coverage/*',
-      '*.json'
-    ]
+    ignores: ['**/node_modules/*', '**/dist/*', '**/coverage/*', '*.json']
   },
   {
     files: ['**/*.ts'],
@@ -20,10 +15,7 @@ export default [
       ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
-        project: [
-          './.github/linters/tsconfig.json',
-          './tsconfig.json'
-        ]
+        project: ['./tsconfig.lint.json']
       },
       globals: {
         ...jestPlugin.environments.globals.globals
@@ -31,19 +23,25 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
-      'jest': jestPlugin
+      jest: jestPlugin
     },
     rules: {
-      'camelcase': 'off',
+      camelcase: 'off',
       'no-console': 'off',
       'no-unused-vars': 'off',
-      'semi': 'off',
+      semi: 'off',
       '@typescript-eslint/array-type': 'error',
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/consistent-type-assertions': 'error',
-      '@typescript-eslint/explicit-member-accessibility': ['error', { 'accessibility': 'no-public' }],
-      '@typescript-eslint/explicit-function-return-type': ['error', { 'allowExpressions': true }],
+      '@typescript-eslint/explicit-member-accessibility': [
+        'error',
+        { accessibility: 'no-public' }
+      ],
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        { allowExpressions: true }
+      ],
       '@typescript-eslint/no-array-constructor': 'error',
       '@typescript-eslint/no-empty-interface': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
@@ -84,4 +82,4 @@ export default [
       '@typescript-eslint/no-var-requires': 'off'
     }
   }
-]; 
+]

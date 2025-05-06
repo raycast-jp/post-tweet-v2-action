@@ -1,0 +1,11 @@
+export default {
+  MD004: { style: 'dash' },
+  MD029: { style: 'one' },
+  MD030: {
+    ul_single: 1,
+    ol_single: 1,
+    ul_multi: 1,
+    ol_multi: 1
+  },
+  MD046: { style: 'fenced' }
+}
