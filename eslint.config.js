@@ -20,7 +20,8 @@ export default [
       globals: {
         ...jestPlugin.environments.globals.globals,
         fetch: 'readonly',
-        Buffer: 'readonly'
+        Buffer: 'readonly',
+        console: 'readonly'
       }
     },
     plugins: {

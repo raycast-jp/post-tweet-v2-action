@@ -34612,6 +34612,7 @@ var cjs = __nccwpck_require__(4455);
 const X = (credentials) => {
     const api = new cjs.TwitterApi(credentials);
     return async (message, imageUrl) => {
+        console.log('imageUrl', imageUrl);
         if (!imageUrl) {
             return api.v2.tweet(message);
         }

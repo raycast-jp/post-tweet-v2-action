@@ -11,6 +11,7 @@ export const X = (credentials: Credentials) => {
   const api = new TwitterApi(credentials)
 
   return async (message: string, imageUrl?: string) => {
+    console.log('imageUrl', imageUrl)
     if (!imageUrl) {
       return api.v2.tweet(message)
     }
