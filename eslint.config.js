@@ -18,7 +18,9 @@ export default [
         project: ['./tsconfig.lint.json']
       },
       globals: {
-        ...jestPlugin.environments.globals.globals
+        ...jestPlugin.environments.globals.globals,
+        fetch: 'readonly',
+        Buffer: 'readonly'
       }
     },
     plugins: {
