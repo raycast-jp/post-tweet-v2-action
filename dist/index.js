@@ -34645,7 +34645,7 @@ async function run() {
             accessToken: core.getInput('access-token'),
             accessSecret: core.getInput('access-token-secret')
         });
-        const result = await x(core.getInput('message'));
+        const result = await x(core.getInput('message'), core.getInput('image'));
         core.setOutput('tweetID', result.data.id);
     }
     catch (error) {
