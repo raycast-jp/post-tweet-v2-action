@@ -34611,8 +34611,21 @@ var cjs = __nccwpck_require__(4455);
 
 const X = (credentials) => {
     const api = new cjs.TwitterApi(credentials);
-    return async (message) => {
-        return api.v2.tweet(message);
+    return async (message, imageUrl) => {
+        if (!imageUrl) {
+            return api.v2.tweet(message);
+        }
+        const response = await fetch(imageUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const mediaId = await api.v1.uploadMedia(buffer, {
+            mimeType: response.headers.get('content-type') || 'image/jpeg'
+        });
+        return api.v2.tweet(message, {
+            media: {
+                media_ids: [mediaId]
+            }
+        });
     };
 };
 
