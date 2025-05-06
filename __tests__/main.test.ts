@@ -7,8 +7,10 @@
  */
 
 import * as core from '@actions/core'
-import * as main from '../src/main'
-import * as XAPI from '../src/x'
+import * as main from '../src/main.js'
+import * as XAPI from '../src/x.js'
+import { jest } from '@jest/globals'
+import { type TweetV2PostTweetResult } from 'twitter-api-v2'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -22,9 +24,13 @@ describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    errorMock = jest.spyOn(core, 'error').mockImplementation()
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-    xMock = jest.spyOn(XAPI, 'X').mockImplementation()
+    errorMock = jest.spyOn(core, 'error').mockImplementation(() => {})
+    getInputMock = jest.spyOn(core, 'getInput').mockImplementation(() => '')
+    xMock = jest
+      .spyOn(XAPI, 'X')
+      .mockImplementation(() => async (message: string) => {
+        return { data: { id: '123', text: message } } as TweetV2PostTweetResult
+      })
   })
 
   it('sets the time output', async () => {
