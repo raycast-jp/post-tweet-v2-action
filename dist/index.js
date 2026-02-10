@@ -3450,6 +3450,187 @@ exports.debug = debug; // for test
 
 /***/ }),
 
+/***/ 3443:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TwitterAdsSandbox = void 0;
+const globals_1 = __nccwpck_require__(7511);
+const client_ads_sandbox_write_1 = __importDefault(__nccwpck_require__(6602));
+/**
+ * Twitter ads sandbox client with all rights (read/write)
+ */
+class TwitterAdsSandbox extends client_ads_sandbox_write_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_SANDBOX_PREFIX;
+    }
+    /**
+     * Get a client with read/write rights.
+     */
+    get readWrite() {
+        return this;
+    }
+}
+exports.TwitterAdsSandbox = TwitterAdsSandbox;
+exports["default"] = TwitterAdsSandbox;
+
+
+/***/ }),
+
+/***/ 489:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const client_subclient_1 = __importDefault(__nccwpck_require__(2827));
+const globals_1 = __nccwpck_require__(7511);
+/**
+ * Base Twitter ads sandbox client with only read rights.
+ */
+class TwitterAdsSandboxReadOnly extends client_subclient_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_SANDBOX_PREFIX;
+    }
+}
+exports["default"] = TwitterAdsSandboxReadOnly;
+
+
+/***/ }),
+
+/***/ 6602:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const globals_1 = __nccwpck_require__(7511);
+const client_ads_sandbox_read_1 = __importDefault(__nccwpck_require__(489));
+/**
+ * Base Twitter ads sandbox client with read/write rights.
+ */
+class TwitterAdsSandboxReadWrite extends client_ads_sandbox_read_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_SANDBOX_PREFIX;
+    }
+    /**
+     * Get a client with only read rights.
+     */
+    get readOnly() {
+        return this;
+    }
+}
+exports["default"] = TwitterAdsSandboxReadWrite;
+
+
+/***/ }),
+
+/***/ 1767:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TwitterAds = void 0;
+const globals_1 = __nccwpck_require__(7511);
+const client_ads_write_1 = __importDefault(__nccwpck_require__(1150));
+const client_ads_sandbox_1 = __importDefault(__nccwpck_require__(3443));
+/**
+ * Twitter ads client with all rights (read/write)
+ */
+class TwitterAds extends client_ads_write_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_PREFIX;
+    }
+    /**
+     * Get a client with read/write rights.
+     */
+    get readWrite() {
+        return this;
+    }
+    /**
+     * Get Twitter Ads Sandbox API client
+     */
+    get sandbox() {
+        if (this._sandbox)
+            return this._sandbox;
+        return this._sandbox = new client_ads_sandbox_1.default(this);
+    }
+}
+exports.TwitterAds = TwitterAds;
+exports["default"] = TwitterAds;
+
+
+/***/ }),
+
+/***/ 6541:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const client_subclient_1 = __importDefault(__nccwpck_require__(2827));
+const globals_1 = __nccwpck_require__(7511);
+/**
+ * Base Twitter ads client with only read rights.
+ */
+class TwitterAdsReadOnly extends client_subclient_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_PREFIX;
+    }
+}
+exports["default"] = TwitterAdsReadOnly;
+
+
+/***/ }),
+
+/***/ 1150:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const globals_1 = __nccwpck_require__(7511);
+const client_ads_read_1 = __importDefault(__nccwpck_require__(6541));
+/**
+ * Base Twitter ads client with read/write rights.
+ */
+class TwitterAdsReadWrite extends client_ads_read_1.default {
+    constructor() {
+        super(...arguments);
+        this._prefix = globals_1.API_ADS_PREFIX;
+    }
+    /**
+     * Get a client with only read rights.
+     */
+    get readOnly() {
+        return this;
+    }
+}
+exports["default"] = TwitterAdsReadWrite;
+
+
+/***/ }),
+
 /***/ 3335:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -3894,7 +4075,7 @@ class RequestHandlerHelper {
         let errorString = `Request failed with code ${code}`;
         if ((_a = data === null || data === void 0 ? void 0 : data.errors) === null || _a === void 0 ? void 0 : _a.length) {
             const errors = data.errors;
-            if ('code' in errors[0]) {
+            if (typeof errors[0] === 'object' && 'code' in errors[0]) {
                 errorString += ' - ' + this.formatV1Errors(errors);
             }
             else {
@@ -3993,6 +4174,13 @@ class RequestHandlerHelper {
                     limit: Number(res.headers['x-app-limit-24hour-limit']),
                     remaining: Number(res.headers['x-app-limit-24hour-remaining']),
                     reset: Number(res.headers['x-app-limit-24hour-reset']),
+                };
+            }
+            if (res.headers['x-user-limit-24hour-limit']) {
+                rateLimit.userDay = {
+                    limit: Number(res.headers['x-user-limit-24hour-limit']),
+                    remaining: Number(res.headers['x-user-limit-24hour-remaining']),
+                    reset: Number(res.headers['x-user-limit-24hour-reset']),
                 };
             }
             if (this.requestData.rateLimitSaver) {
@@ -4924,6 +5112,7 @@ exports.TwitterApiReadOnly = exports.TwitterApiReadWrite = exports.TwitterApi = 
 const client_v1_1 = __importDefault(__nccwpck_require__(147));
 const client_v2_1 = __importDefault(__nccwpck_require__(6203));
 const readwrite_1 = __importDefault(__nccwpck_require__(4796));
+const client_ads_1 = __importDefault(__nccwpck_require__(1767));
 // "Real" exported client for usage of TwitterApi.
 /**
  * Twitter v1.1 and v2 API client.
@@ -4945,6 +5134,14 @@ class TwitterApi extends readwrite_1.default {
      */
     get readWrite() {
         return this;
+    }
+    /**
+     * Get Twitter Ads API client
+     */
+    get ads() {
+        if (this._ads)
+            return this._ads;
+        return this._ads = new client_ads_1.default(this);
     }
     /* Static helpers */
     static getErrors(error) {
@@ -4997,7 +5194,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const _1 = __importDefault(__nccwpck_require__(1479));
 const client_base_1 = __importDefault(__nccwpck_require__(157));
 const client_v1_read_1 = __importDefault(__nccwpck_require__(1865));
 const client_v2_read_1 = __importDefault(__nccwpck_require__(7265));
@@ -5108,7 +5304,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         if (tokens.type !== 'oauth-1.0a')
             throw new Error('You must setup TwitterApi instance with consumer keys to accept OAuth 1.0 login');
         const oauth_result = await this.post('https://api.x.com/oauth/access_token', { oauth_token: tokens.accessToken, oauth_verifier });
-        const client = new _1.default({
+        const client = new this.constructor({
             appKey: tokens.appKey,
             appSecret: tokens.appSecret,
             accessToken: oauth_result.oauth_token,
@@ -5139,10 +5335,10 @@ class TwitterApiReadOnly extends client_base_1.default {
         if (tokens.type !== 'oauth-1.0a')
             throw new Error('You must setup TwitterApi instance with consumer keys to accept app-only login');
         // Create a client with Basic authentication
-        const basicClient = new _1.default({ username: tokens.appKey, password: tokens.appSecret }, this._requestMaker.clientSettings);
+        const basicClient = new this.constructor({ username: tokens.appKey, password: tokens.appSecret }, this._requestMaker.clientSettings);
         const res = await basicClient.post('https://api.x.com/oauth2/token', { grant_type: 'client_credentials' });
         // New object with Bearer token
-        return new _1.default(res.access_token, this._requestMaker.clientSettings);
+        return new this.constructor(res.access_token, this._requestMaker.clientSettings);
     }
     /* OAuth 2 user authentication */
     /**
@@ -5285,7 +5481,7 @@ class TwitterApiReadOnly extends client_base_1.default {
         });
     }
     parseOAuth2AccessTokenResult(result) {
-        const client = new _1.default(result.access_token, this._requestMaker.clientSettings);
+        const client = new this.constructor(result.access_token, this._requestMaker.clientSettings);
         const scope = result.scope.split(' ').filter(e => e);
         return {
             client,
@@ -5344,12 +5540,14 @@ exports["default"] = TwitterApiReadWrite;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.API_V1_1_STREAM_PREFIX = exports.API_V1_1_UPLOAD_PREFIX = exports.API_V1_1_PREFIX = exports.API_V2_LABS_PREFIX = exports.API_V2_PREFIX = void 0;
+exports.API_ADS_SANDBOX_PREFIX = exports.API_ADS_PREFIX = exports.API_V1_1_STREAM_PREFIX = exports.API_V1_1_UPLOAD_PREFIX = exports.API_V1_1_PREFIX = exports.API_V2_LABS_PREFIX = exports.API_V2_PREFIX = void 0;
 exports.API_V2_PREFIX = 'https://api.x.com/2/';
 exports.API_V2_LABS_PREFIX = 'https://api.x.com/labs/2/';
 exports.API_V1_1_PREFIX = 'https://api.x.com/1.1/';
 exports.API_V1_1_UPLOAD_PREFIX = 'https://upload.x.com/1.1/';
 exports.API_V1_1_STREAM_PREFIX = 'https://stream.x.com/1.1/';
+exports.API_ADS_PREFIX = 'https://ads-api.x.com/12/';
+exports.API_ADS_SANDBOX_PREFIX = 'https://ads-api-sandbox.twitter.com/12/';
 
 
 /***/ }),
@@ -5381,9 +5579,10 @@ function arrayWrap(value) {
 exports.arrayWrap = arrayWrap;
 function trimUndefinedProperties(object) {
     // Delete undefined parameters
-    for (const parameter in object) {
-        if (object[parameter] === undefined)
+    for (const parameter of Object.keys(object)) {
+        if (object[parameter] === undefined) {
             delete object[parameter];
+        }
     }
 }
 exports.trimUndefinedProperties = trimUndefinedProperties;
@@ -7741,6 +7940,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ 306:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ 258:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -7766,6 +7974,7 @@ __exportStar(__nccwpck_require__(8176), exports);
 __exportStar(__nccwpck_require__(9502), exports);
 __exportStar(__nccwpck_require__(4482), exports);
 __exportStar(__nccwpck_require__(531), exports);
+__exportStar(__nccwpck_require__(306), exports);
 
 
 /***/ }),
@@ -8914,7 +9123,7 @@ class TwitterApiv1ReadWrite extends client_v1_read_1.default {
         return this.post(endpoint, options);
     }
     /**
-     * Removes multiple members to a list, by specifying a comma-separated list of member ids or screen names.
+     * Removes one or more members from a list, by specifying a comma-separated list of member ids or screen names.
      * If you add a single `user_id` or `screen_name`, it will target `lists/members/destroy.json`, otherwise
      * it will target `lists/members/destroy_all.json`.
      * https://developer.x.com/en/docs/twitter-api/v1/accounts-and-users/create-manage-lists/api-reference/post-lists-members-destroy_all
@@ -10087,6 +10296,29 @@ class TwitterApiv2ReadOnly extends client_subclient_1.default {
             .filter(line => line)
             .map(line => JSON.parse(line));
     }
+    /* Usage */
+    /**
+     * Allows you to retrieve your project usage.
+     *
+     * https://developer.x.com/en/docs/x-api/usage/tweets/introduction
+     */
+    async usage(options = {}) {
+        return this.get('usage/tweets', options);
+    }
+    /**
+     * Returns a variety of information about a single Community specified by ID.
+     * https://docs.x.com/x-api/communities/communities-lookup-by-community-id
+     */
+    community(communityId, options = {}) {
+        return this.get('communities/:id', options, { params: { id: communityId } });
+    }
+    /**
+     * Search for Communities based on keywords.
+     * https://docs.x.com/x-api/communities/search-communities
+     */
+    searchCommunities(query, options = {}) {
+        return this.get('communities/search', { query, ...options });
+    }
 }
 exports["default"] = TwitterApiv2ReadOnly;
 
@@ -10185,6 +10417,88 @@ class TwitterApiv2ReadWrite extends client_v2_read_1.default {
             payload = { text: status, ...payload };
         }
         return this.post('tweets', payload);
+    }
+    /**
+     * Uploads media to Twitter using chunked upload.
+     * https://docs.x.com/x-api/media/media-upload
+     *
+     * @param media The media buffer to upload
+     * @param options Upload options including media type and category, and additional owners
+     * @param chunkSize Size of each chunk in bytes (default: 1MB)
+     * @returns The media ID of the uploaded media
+     */
+    async uploadMedia(media, options, chunkSize = 1024 * 1024) {
+        let media_category = options.media_category;
+        // If no media category is provided, try to infer it from the media type
+        if (!options.media_category) {
+            if (options.media_type.includes('gif')) {
+                media_category = 'tweet_gif';
+            }
+            else if (options.media_type.includes('image')) {
+                media_category = 'tweet_image';
+            }
+            else if (options.media_type.includes('video')) {
+                media_category = 'tweet_video';
+            }
+        }
+        const initArguments = {
+            additional_owners: options.additional_owners,
+            media_type: options.media_type,
+            total_bytes: media.length,
+            media_category,
+        };
+        const initResponse = await this.post('media/upload/initialize', initArguments);
+        const mediaId = initResponse.data.id;
+        const chunksCount = Math.ceil(media.length / chunkSize);
+        const mediaArray = new Uint8Array(media);
+        for (let i = 0; i < chunksCount; i++) {
+            const start = i * chunkSize;
+            const end = Math.min(start + chunkSize, media.length);
+            const mediaChunk = mediaArray.slice(start, end);
+            const chunkedBuffer = Buffer.from(mediaChunk);
+            const appendArguments = {
+                segment_index: i,
+                media: chunkedBuffer,
+            };
+            await this.post(`media/upload/${mediaId}/append`, appendArguments, { forceBodyMode: 'form-data' });
+        }
+        const finalizeResponse = await this.post(`media/upload/${mediaId}/finalize`);
+        if (finalizeResponse.data.processing_info) {
+            await this.waitForMediaProcessing(mediaId);
+        }
+        return mediaId;
+    }
+    async waitForMediaProcessing(mediaId) {
+        var _a;
+        const response = await this.get('media/upload', {
+            command: 'STATUS',
+            media_id: mediaId,
+        });
+        const info = response.data.processing_info;
+        if (!info)
+            return;
+        switch (info.state) {
+            case 'succeeded':
+                return;
+            case 'failed':
+                throw new Error(`Media processing failed: ${(_a = info.error) === null || _a === void 0 ? void 0 : _a.message}`);
+            case 'pending':
+            case 'in_progress': {
+                const waitTime = info === null || info === void 0 ? void 0 : info.check_after_secs;
+                if (waitTime && waitTime > 0) {
+                    await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+                    await this.waitForMediaProcessing(mediaId);
+                }
+            }
+        }
+    }
+    /**
+     * Creates the metadata for media to be uploaded.
+     * This feature is currently only supported for images and GIFs.
+     * https://docs.x.com/x-api/media/metadata-create
+     */
+    createMediaMetadata(mediaId, metadata) {
+        return this.post('media/metadata', { id: mediaId, metadata });
     }
     /**
      * Reply to a Tweet on behalf of an authenticated user.
