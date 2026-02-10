@@ -3,10 +3,10 @@
  */
 
 import * as main from '../src/main.js'
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 
 // Mock the action's entrypoint
-const runMock = jest
+const runMock = vi
   .spyOn(main, 'run')
   .mockImplementation(async () => Promise.resolve())
 

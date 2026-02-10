@@ -1,12 +1,17 @@
 import eslint from '@eslint/js'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
-import jestPlugin from 'eslint-plugin-jest'
 
 export default [
   eslint.configs.recommended,
   {
-    ignores: ['**/node_modules/*', '**/dist/*', '**/coverage/*', '*.json']
+    ignores: [
+      '**/node_modules/*',
+      '**/dist/*',
+      '**/coverage/*',
+      '*.json',
+      'vitest.config.ts'
+    ]
   },
   {
     files: ['**/*.ts'],
@@ -18,15 +23,13 @@ export default [
         project: ['./tsconfig.lint.json']
       },
       globals: {
-        ...jestPlugin.environments.globals.globals,
         fetch: 'readonly',
         Buffer: 'readonly',
         console: 'readonly'
       }
     },
     plugins: {
-      '@typescript-eslint': tseslint,
-      jest: jestPlugin
+      '@typescript-eslint': tseslint
     },
     rules: {
       camelcase: 'off',
@@ -76,6 +79,13 @@ export default [
     files: ['**/__tests__/**/*.ts'],
     languageOptions: {
       globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
         require: 'readonly',
         module: 'readonly',
         process: 'readonly'

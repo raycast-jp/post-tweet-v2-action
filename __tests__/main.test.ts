@@ -6,36 +6,29 @@
  * variables following the pattern `INPUT_<INPUT_NAME>`.
  */
 
-import * as core from '@actions/core'
-import * as main from '../src/main.js'
-import * as XAPI from '../src/x.js'
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { type TweetV2PostTweetResult } from 'twitter-api-v2'
 
-// Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
+vi.mock('@actions/core')
+vi.mock('../src/x.js')
 
-// Mock the GitHub Actions core library
-let errorMock: jest.SpiedFunction<typeof core.error>
-let getInputMock: jest.SpiedFunction<typeof core.getInput>
-let xMock: jest.SpiedFunction<typeof XAPI.X>
+const core = await import('@actions/core')
+const XAPI = await import('../src/x.js')
+const main = await import('../src/main.js')
 
 describe('action', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
-    errorMock = jest.spyOn(core, 'error').mockImplementation(() => {})
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation(() => '')
-    xMock = jest
-      .spyOn(XAPI, 'X')
-      .mockImplementation(() => async (message: string) => {
-        return { data: { id: '123', text: message } } as TweetV2PostTweetResult
-      })
+    vi.mocked(core.getInput).mockReturnValue('')
+    vi.mocked(XAPI.X).mockReturnValue(
+      async (message: string) =>
+        ({ data: { id: '123', text: message } }) as TweetV2PostTweetResult
+    )
   })
 
   it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(message => {
+    vi.mocked(core.getInput).mockImplementation(message => {
       switch (message) {
         case 'message':
           return 'whoa!!'
@@ -45,15 +38,14 @@ describe('action', () => {
     })
 
     await main.run()
-    expect(runMock).toHaveReturned()
 
-    expect(xMock).toHaveBeenCalledWith({
+    expect(XAPI.X).toHaveBeenCalledWith({
       accessSecret: '',
       accessToken: '',
       appKey: '',
       appSecret: ''
     })
 
-    expect(errorMock).not.toHaveBeenCalled()
+    expect(core.error).not.toHaveBeenCalled()
   })
 })
