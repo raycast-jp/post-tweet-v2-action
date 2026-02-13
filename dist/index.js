@@ -38302,16 +38302,16 @@ var cjs = __nccwpck_require__(4455);
 
 const X = (credentials) => {
     const api = new cjs.TwitterApi(credentials);
-    return async (message, imageUrl) => {
-        console.log('imageUrl', imageUrl);
-        if (!imageUrl) {
+    return async (message, mediaUrl) => {
+        console.log('mediaUrl', mediaUrl);
+        if (!mediaUrl) {
             return api.v2.tweet(message);
         }
-        const response = await fetch(imageUrl);
+        const response = await fetch(mediaUrl);
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const mediaId = await api.v1.uploadMedia(buffer, {
-            mimeType: response.headers.get('content-type') || 'image/jpeg'
+            mimeType: response.headers.get('content-type') || 'application/octet-stream'
         });
         return api.v2.tweet(message, {
             media: {
@@ -38337,7 +38337,7 @@ async function run() {
             accessToken: getInput('access-token'),
             accessSecret: getInput('access-token-secret')
         });
-        const result = await x(getInput('message'), getInput('image'));
+        const result = await x(getInput('message'), getInput('media'));
         setOutput('tweetID', result.data.id);
     }
     catch (error) {

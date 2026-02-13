@@ -11,8 +11,8 @@ inputs:
   message:
     description: 'The message ("tweet") to post to twitter.'
     required: true
-  image:
-    description: 'The image to post to twitter.'
+  media:
+    description: 'The media URL (image, video, or GIF) to post to twitter.'
     required: false
   consumer-key:
     description:
