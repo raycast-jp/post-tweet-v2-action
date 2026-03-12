@@ -42,7 +42,7 @@
     "twitter-api-v2": "^1.29.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^25.4.0",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.18.0",
     "@vercel/ncc": "^0.38.4",
