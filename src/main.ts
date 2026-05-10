@@ -14,7 +14,14 @@ export async function run(): Promise<void> {
       accessToken: core.getInput('access-token'),
       accessSecret: core.getInput('access-token-secret')
     })
-    const result = await x(core.getInput('message'), core.getInput('media'))
+    const threadMessage = core.getInput('thread-message')
+    const result = await x(
+      core.getInput('message'),
+      core.getInput('media'),
+      threadMessage
+        ? { message: threadMessage, mediaUrl: core.getInput('thread-media') }
+        : undefined
+    )
     core.setOutput('tweetID', result.data.id)
   } catch (error) {
     // Fail the workflow run if an error occurs
