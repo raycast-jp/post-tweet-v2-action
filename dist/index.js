@@ -38311,7 +38311,9 @@ const uploadMedia = async (api, mediaUrl) => {
 const X = (credentials) => {
     const api = new cjs.TwitterApi(credentials);
     const post = async (message, mediaUrl, inReplyToTweetId) => {
-        const mediaIds = mediaUrl ? [await uploadMedia(api.readWrite, mediaUrl)] : [];
+        const mediaIds = mediaUrl
+            ? [await uploadMedia(api.readWrite, mediaUrl)]
+            : [];
         return api.v2.tweet(message, {
             ...(mediaIds.length > 0 && {
                 media: { media_ids: mediaIds }

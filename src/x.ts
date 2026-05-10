@@ -36,7 +36,9 @@ export const X = (credentials: Credentials) => {
     mediaUrl?: string,
     inReplyToTweetId?: string
   ): Promise<TweetV2PostTweetResult> => {
-    const mediaIds = mediaUrl ? [await uploadMedia(api.readWrite, mediaUrl)] : []
+    const mediaIds = mediaUrl
+      ? [await uploadMedia(api.readWrite, mediaUrl)]
+      : []
     return api.v2.tweet(message, {
       ...(mediaIds.length > 0 && {
         media: { media_ids: mediaIds as [string] }

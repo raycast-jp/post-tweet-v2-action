@@ -16,13 +16,12 @@ inputs:
     required: false
   thread-message:
     description:
-      'The message of a single reply tweet posted as a thread to the main
-      tweet. Leave empty to post a single tweet.'
+      'The message of a single reply tweet posted as a thread to the main tweet.
+      Leave empty to post a single tweet.'
     required: false
   thread-media:
     description:
-      'The media URL (image, video, or GIF) attached to the thread reply
-      tweet.'
+      'The media URL (image, video, or GIF) attached to the thread reply tweet.'
     required: false
   consumer-key:
     description:
