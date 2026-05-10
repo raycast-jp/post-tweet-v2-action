@@ -17,14 +17,16 @@ const XAPI = await import('../src/x.js')
 const main = await import('../src/main.js')
 
 describe('action', () => {
+  const xMock = vi.fn(
+    async (message: string) =>
+      ({ data: { id: '123', text: message } }) as TweetV2PostTweetResult
+  )
+
   beforeEach(() => {
     vi.clearAllMocks()
 
     vi.mocked(core.getInput).mockReturnValue('')
-    vi.mocked(XAPI.X).mockReturnValue(
-      async (message: string) =>
-        ({ data: { id: '123', text: message } }) as TweetV2PostTweetResult
-    )
+    vi.mocked(XAPI.X).mockReturnValue(xMock)
   })
 
   it('sets the time output', async () => {
@@ -47,5 +49,44 @@ describe('action', () => {
     })
 
     expect(core.error).not.toHaveBeenCalled()
+  })
+
+  it('passes thread options when thread-message is provided', async () => {
+    vi.mocked(core.getInput).mockImplementation(name => {
+      switch (name) {
+        case 'message':
+          return 'main tweet'
+        case 'media':
+          return 'https://example.com/main.png'
+        case 'thread-message':
+          return 'reply tweet'
+        case 'thread-media':
+          return 'https://example.com/reply.png'
+        default:
+          return ''
+      }
+    })
+
+    await main.run()
+
+    expect(xMock).toHaveBeenCalledWith(
+      'main tweet',
+      'https://example.com/main.png',
+      {
+        message: 'reply tweet',
+        mediaUrl: 'https://example.com/reply.png'
+      }
+    )
+    expect(core.error).not.toHaveBeenCalled()
+  })
+
+  it('omits thread options when thread-message is empty', async () => {
+    vi.mocked(core.getInput).mockImplementation(name =>
+      name === 'message' ? 'main tweet' : ''
+    )
+
+    await main.run()
+
+    expect(xMock).toHaveBeenCalledWith('main tweet', '', undefined)
   })
 })

@@ -38300,24 +38300,37 @@ function getIDToken(aud) {
 var cjs = __nccwpck_require__(4455);
 ;// CONCATENATED MODULE: ./src/x.ts
 
+const uploadMedia = async (api, mediaUrl) => {
+    const response = await fetch(mediaUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return api.v1.uploadMedia(buffer, {
+        mimeType: response.headers.get('content-type') || 'application/octet-stream'
+    });
+};
 const X = (credentials) => {
     const api = new cjs.TwitterApi(credentials);
-    return async (message, mediaUrl) => {
-        console.log('mediaUrl', mediaUrl);
-        if (!mediaUrl) {
-            return api.v2.tweet(message);
-        }
-        const response = await fetch(mediaUrl);
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const mediaId = await api.v1.uploadMedia(buffer, {
-            mimeType: response.headers.get('content-type') || 'application/octet-stream'
-        });
+    const post = async (message, mediaUrl, inReplyToTweetId) => {
+        const mediaIds = mediaUrl
+            ? [await uploadMedia(api.readWrite, mediaUrl)]
+            : [];
         return api.v2.tweet(message, {
-            media: {
-                media_ids: [mediaId]
-            }
+            ...(mediaIds.length > 0 && {
+                media: { media_ids: mediaIds }
+            }),
+            ...(inReplyToTweetId && {
+                reply: { in_reply_to_tweet_id: inReplyToTweetId }
+            })
         });
+    };
+    return async (message, mediaUrl, thread) => {
+        console.log('mediaUrl', mediaUrl);
+        const main = await post(message, mediaUrl);
+        if (thread?.message) {
+            console.log('thread.mediaUrl', thread.mediaUrl);
+            await post(thread.message, thread.mediaUrl, main.data.id);
+        }
+        return main;
     };
 };
 
@@ -38337,7 +38350,10 @@ async function run() {
             accessToken: getInput('access-token'),
             accessSecret: getInput('access-token-secret')
         });
-        const result = await x(getInput('message'), getInput('media'));
+        const threadMessage = getInput('thread-message');
+        const result = await x(getInput('message'), getInput('media'), threadMessage
+            ? { message: threadMessage, mediaUrl: getInput('thread-media') }
+            : undefined);
         setOutput('tweetID', result.data.id);
     }
     catch (error) {

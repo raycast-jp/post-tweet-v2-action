@@ -14,6 +14,15 @@ inputs:
   media:
     description: 'The media URL (image, video, or GIF) to post to twitter.'
     required: false
+  thread-message:
+    description:
+      'The message of a single reply tweet posted as a thread to the main tweet.
+      Leave empty to post a single tweet.'
+    required: false
+  thread-media:
+    description:
+      'The media URL (image, video, or GIF) attached to the thread reply tweet.'
+    required: false
   consumer-key:
     description:
       'Consumer API key, available in the "Keys and tokens" section of your
